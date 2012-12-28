@@ -55,7 +55,7 @@ int division = 2;
 // and the +5V wire to a +5V supply
 
 // Set the first variable to the NUMBER of pixels. 25 = 25 pixels in a row
-Adafruit_WS2801 strip = Adafruit_WS2801(22, dataPin, clockPin);
+Adafruit_WS2801 strip = Adafruit_WS2801(72	, dataPin, clockPin);
 
 // Optional: leave off pin numbers to use hardware SPI
 // (pinout is then specific to each board and can't be changed)
@@ -109,14 +109,16 @@ void loop() {
   // Serial.println(strip.getPixelColor(2));
 
   // Update the spectrum values.
-	readSpectrum();
+	// readSpectrum();
 
+	// rainbowCycle(10);
 	
-  // showSpectrum(100);
+  // showSpectrum(10);
 	// CrazyPixel(Color(0,0,45));
-	
-	colorWipe(rgba(255, 100, 250,1), 50);
+	colorWipe(rgba(255, 255, 255,1), 5);
+	// ASCSparkle();
 
+	// BlackToBright(0,44,0,10);
 
   
   // Some example procedures showing how to display to the pixels
@@ -132,25 +134,23 @@ void showSpectrum(uint8_t wait)
 {
 	
   byte Band, BarSize, MaxLevel;
-  static unsigned int  Divisor = 80, ChangeTimer=0;
+  static unsigned int  Divisor = 20, ChangeTimer=0;
   unsigned int works, Remainder;
 
   int peak = Spectrum[2]/Divisor;
 	int wheel = Spectrum[1]/10;
 
   MaxLevel = 0; 
- 	
-	// sparkle(Color(45,45,45),Spectrum[1]/Divisor,0);
 
    for (int i=0; i < strip.numPixels() / division; i++) {
      if (i <= peak) {
- 				// mirror(i, Wheel(wheel+(i*4) )); 
+ 				// mirror(i, Wheel(wheel+(i*4) ),1); 
 				q(i,Color(0,0,45));
-   			// mirror(i, Wheel(random(0,wheel))); 
+   			// mirror(i, Wheel(random(0,wheel)),1); 
       } else {
         q(i, Color(0,0,0));
    		}
-   			//Serial.println((wheel));
+   			Serial.println(peak);
    }  
 		
   // strip.show();
@@ -215,7 +215,7 @@ void readSpectrum()
 
 void BlackToBright(uint8_t r, uint8_t g, uint8_t b, uint8_t DELAY){
   int i, value;
-  for(i=0;i<strip.numPixels();i++) {
+  for(i=0;i<strip.numPixels()/division;i++) {
       q(i, Color(0,0,0));
    } 
    strip.show();
@@ -223,7 +223,7 @@ void BlackToBright(uint8_t r, uint8_t g, uint8_t b, uint8_t DELAY){
      r = r * (value/100);
      g = g * (value/100);
      b = b * (value/100);
-     for(i=0;i<strip.numPixels();i++) {
+     for(i=0;i<strip.numPixels()/division;i++) {
         q(i, Color(r,g,b));
      } 
      strip.show(); 
@@ -315,11 +315,7 @@ uint32_t RandomColor(){
 
 // "Queue" method to translate pixel positions for standard, mirrored, and radial modes.
 void q(int pos, uint32_t color) {
-	
-	if (kick && color != 0) {
-		color = rgba(255,255,255,.5);
-	}
-	
+		
 	if (division == 1) {
 		strip.setPixelColor(pos,color);
 	} else if (division == 2) {
@@ -335,35 +331,96 @@ void q(int pos, uint32_t color) {
 // Translate the LED position to Mirror the strand output.
 void mirror(int pos, uint32_t color) {
 
-// Left vs Right alignment for DJ Booth EQ
-// Left 0 = 1           // Right 0 = 0
-// Left 1 = 2           // Right 1 = 21
-// Left 2 = 3           // Right 2 = 19
-// Left 3 = 4           // Right 3 = 20
-// Left 4 = 5           // Right 4 = 18
+// Left vs Right alignment for forward section
+// Left 0 = 11          // Right 0 = 12
+// Left 1 = 10          // Right 1 = 13
+// Left 2 = 9           // Right 2 = 14
+// Left 3 = 8           // Right 3 = 15
+// Left 4 = 7           // Right 4 = 16
 // Left 5 = 6           // Right 5 = 17
-// Left 6 = 7           // Right 6 = 16
-// Left 7 = 8           // Right 7 = 15
-// Left 8 = 9           // Right 8 = 14
-// Left 9 = 10          // Right 9 = 12
-// Left 10 = 11         // Right 10 = 11
+// Left 6 = 5           // Right 6 = 18
+// Left 7 = 4           // Right 7 = 29
+// Left 8 = 3           // Right 8 = 20
+// Left 9 = 2           // Right 9 = 21 
+// Left 10 = 1          // Right 10 = 0	
+												
+// Left 11 = 27         // Right 11 = 30
+// Left 12 = 26         // Right 12 = 31
+// Left 13 = 25         // Right 13 = 32
+// Left 14 = 24         // Right 14 = 33
+// Left 15 = 23         // Right 15 = 34
+// Left 16 = 22         // Right 16 = 35
+
+                                       
+// Left 17 = 72           // Right 17 = 36
+// Left 18 = 71           // Right 18 = 37
+// Left 19 = 70           // Right 19 = 38
+// Left 20 = 69           // Right 20 = 39
+// Left 21 = 68         // Right 21 = 40
+// Left 22 = 67         // Right 22 = 41
+
+
+// Left 23 = 66         // Right 23 = 42
+// Left 24 = 65         // Right 24 = 43
+// Left 25 = 64         // Right 25 = 44
+
+// Left 6 = 5           // R 27 = 62
+// Left 6 = 5           // R 28 = 63
+// Left 7 = 4           // R 29 = 62
+												// R 30 = 61			
+// Left 6 = 5           // R 31 = 60
+// Left 7 = 4           // R 32 = 59
+// Left 8 = 3           // R 33 = 58
+// Left 9 = 2           // R 34 = 57 
+// Left 10 = 1          // R 35 = 56
+
+
+
+
 
 // Center = 12 /// For a radial translation
+// Center = 30 /// For a radial translation
 
+	int left,right;
+	
 	if (pos >= strip.numPixels()/2) {
 		// pos = (pos / 2) + 
-		Serial.println(pos);
+		// Serial.println(pos);
 	}
  	
-	int left = pos+1;
-	int right = strip.numPixels()-pos;
+	if (pos >= 0 && pos <= 10) {
+		left = 11 - pos;
+		right = 12 + pos;
+		if (pos == 10) { right = 0; }
+	}	
 
-
-	// Adjustments
-	if(pos == 0) { right = 0; }
-	if(pos == 2) { right = 19; }	
-	if(pos == 3) { right = 20; }		
+	if (pos >= 11 && pos <= 17) {
+		left = 40 - pos;
+		right = 19 + pos;
+	}	
 	
+  if (pos >= 18 && pos <= 23) {
+		left = 90 - pos;
+		right = 19 + pos;
+	}
+	
+	if (pos >= 24 && pos <= 26) {
+	// 	left = 41 - pos;
+	// 	right = 21 + pos;				
+		// if (pos == 25) { left = 49; }
+		return;
+	}
+	
+	if (pos >= 27 && pos <= 35) {
+		// R = 56 - 9  47 = 27
+		left = 20 + pos;
+		right = 91 - pos;
+				
+		// if (pos == 25) { left = 49; }
+	}	
+	
+  // strip.setPixelColor(left, Color(255,0,255));
+  // strip.setPixelColor(right, Color(0,255,255));
   strip.setPixelColor(left, color);
   strip.setPixelColor(right, color);
 }
@@ -374,9 +431,9 @@ void rainbow(uint8_t wait) {
    
   for (j=0; j < 256; j++) {     // 3 cycles of all 256 colors in the wheel
     for (i=0; i < strip.numPixels(); i++) {
-      strip.setPixelColor(i, Wheel( (i + j) % 255));
-          Serial.println((i + j) % 255);
-          Serial.println(Wheel( (i + j) % 255));
+      strip.setPixelColor(i, Wheel( (i + j) % 255,1));
+          // Serial.println((i + j) % 255);
+          // Serial.println(Wheel( (i + j) % 255,1));
     }  
     strip.show();   // write all the pixels out 
     delay(wait);
@@ -388,18 +445,20 @@ void rainbow(uint8_t wait) {
 // Slightly different, this one makes the rainbow wheel equally distributed 
 // along the chain
 void rainbowCycle(uint8_t wait) {
-  int i, j;
+	int i, j;
+	double a=1;
   
   for (j=0; j < 256 * 5; j++) {     // 5 cycles of all 25 colors in the wheel
-    for (i=0; i < strip.numPixels(); i++) {
+	
+    for (i=0; i < strip.numPixels()/division; i++) {
       // tricky math! we use each pixel as a fraction of the full 96-color wheel
       // (thats the i / strip.numPixels() part)
       // Then add in j which makes the colors go around per pixel
       // the % 96 is to make the wheel cycle around
-      strip.setPixelColor(i, Wheel( ((i * 256 / strip.numPixels()) + j) % 256) );
+      q(i, Wheel( ((i * 256 / strip.numPixels()) + j) % 256,a) );
     }  
     strip.show();   // write all the pixels out
-    delay(wait);
+		delay(wait);    
   }
 }
 
@@ -409,7 +468,7 @@ void colorWipe(uint32_t c, uint8_t wait) {
   int i;
   
   for (i=0; i < strip.numPixels(); i++) {
-      strip.setPixelColor(i, c);
+      q(i, c);
       strip.show();
       delay(wait);
   }
@@ -440,15 +499,15 @@ uint32_t Color(byte r, byte g, byte b)
 
 //Input a value 0 to 255 to get a color value.
 //The colours are a transition r - g -b - back to r
-uint32_t Wheel(byte WheelPos)
+uint32_t Wheel(byte WheelPos, double a)
 {
   if (WheelPos < 85) {
-   return Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+   return rgba(WheelPos * 3, 255 - WheelPos * 3, 0,a);
   } else if (WheelPos < 170) {
    WheelPos -= 85;
-   return Color(255 - WheelPos * 3, 0, WheelPos * 3);
+   return rgba(255 - WheelPos * 3, 0, WheelPos * 3,a);
   } else {
    WheelPos -= 170; 
-   return Color(0, WheelPos * 3, 255 - WheelPos * 3);
+   return rgba(0, WheelPos * 3, 255 - WheelPos * 3,a);
   }
 }
