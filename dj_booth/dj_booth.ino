@@ -104,13 +104,19 @@ void setup() {
 
 void loop() {
 
-	
-  showSpectrum(10);
-  
- //   rainbow(100);
   //  Console Output Testing
+	// Serial.println(millis()/1000);
+  // Serial.println(strip.getPixelColor(2));
 
-  //  Serial.println(strip.getPixelColor(2));
+  // Update the spectrum values.
+	readSpectrum();
+
+	
+  // showSpectrum(100);
+	// CrazyPixel(Color(0,0,45));
+	
+	colorWipe(rgba(255, 100, 250,1), 50);
+
 
   
   // Some example procedures showing how to display to the pixels
@@ -124,9 +130,7 @@ void loop() {
 
 void showSpectrum(uint8_t wait)
 {
-  // Update the spectrum values.
-	readSpectrum();
-
+	
   byte Band, BarSize, MaxLevel;
   static unsigned int  Divisor = 80, ChangeTimer=0;
   unsigned int works, Remainder;
@@ -212,7 +216,7 @@ void readSpectrum()
 void BlackToBright(uint8_t r, uint8_t g, uint8_t b, uint8_t DELAY){
   int i, value;
   for(i=0;i<strip.numPixels();i++) {
-      strip.setPixelColor(i, Color(0,0,0));
+      q(i, Color(0,0,0));
    } 
    strip.show();
    for(value=0;value<101;i++) {
@@ -220,7 +224,7 @@ void BlackToBright(uint8_t r, uint8_t g, uint8_t b, uint8_t DELAY){
      g = g * (value/100);
      b = b * (value/100);
      for(i=0;i<strip.numPixels();i++) {
-        strip.setPixelColor(i, Color(r,g,b));
+        q(i, Color(r,g,b));
      } 
      strip.show(); 
      delay(DELAY);
@@ -261,10 +265,10 @@ void ColorJump(uint8_t DELAY){
   int i;
   uint32_t COLOR;
   COLOR = RandomColor();
-  for(i=0;i<strip.numPixels();i++) { strip.setPixelColor(i, COLOR); }
+  for(i=0;i<strip.numPixels();i++) { q(i, COLOR); }
   strip.show();
   delay(DELAY/2);
-  for(i=0;i<strip.numPixels();i++) { strip.setPixelColor(i, Color(0,0,0)); }
+  for(i=0;i<strip.numPixels();i++) { q(i, Color(0,0,0)); }
   strip.show();
   delay(DELAY/2);
 }
@@ -289,14 +293,14 @@ void sparkle(uint32_t COLOR, uint8_t DENSITY, uint8_t DELAY){
   
   for(i=0; i < strip.numPixels(); i++ ) {
 		// strip.setPixelColor(i, Color(0,0,0));
-    mirror(i, Color(0,0,0));
+    q(i, Color(0,0,0));
   }
   strip.show();
   
   for( r=0; r < DENSITY; r++ )  {
    PIXEL = TrueRandom.random(1,Total);
    // strip.setPixelColor(PIXEL, COLOR);
-	 mirror(PIXEL, COLOR);
+	 q(PIXEL, COLOR);
   }
   strip.show();
   
@@ -313,7 +317,6 @@ uint32_t RandomColor(){
 void q(int pos, uint32_t color) {
 	
 	if (kick && color != 0) {
-		color = Color(255,255,255);
 		color = rgba(255,255,255,.5);
 	}
 	
