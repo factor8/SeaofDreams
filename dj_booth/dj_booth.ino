@@ -314,6 +314,7 @@ void q(int pos, uint32_t color) {
 	
 	if (kick && color != 0) {
 		color = Color(255,255,255);
+		color = rgba(255,255,255,.5);
 	}
 	
 	if (division == 1) {
@@ -412,6 +413,15 @@ void colorWipe(uint32_t c, uint8_t wait) {
 }
 
 /* Helper functions */
+
+uint32_t rgba(byte r, byte g, byte b, double a) {
+	
+	int rr = r*a;
+	int gg = g*a;
+	int bb = b*a;
+	
+	return Color(rr,gg,bb);
+}
 
 // Create a 24 bit color value from R,G,B
 uint32_t Color(byte r, byte g, byte b)
