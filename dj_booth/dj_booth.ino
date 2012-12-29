@@ -31,6 +31,12 @@ Example sketch for driving Adafruit WS2801 pixels!
 int dataPin  = 8;    // Yellow wire on Adafruit Pixels
 int clockPin = 10;    // Green wire on Adafruit Pixels
 
+// Number of pixels.
+int pixels = 18;
+
+// Division sets the strand mode. 1 is regular, 2 is Mirror, 3 is Triangle (not added yet), 4 is Radial.
+int division = 1;
+
 //For spectrum analyzer shield, these three pins are used.
 //You can move pinds 4 and 5, but you must cut the trace on the shield and re-route from the 2 jumpers. 
 int spectrumReset=5;
@@ -41,21 +47,22 @@ int spectrumAnalog=0;  //0 for left channel, 1 for right.
 int Spectrum[7];
 
 int average = 0;
-
 int kickThreshold = 0;
 int snareThreshold = 0;
-
 int kick = 0;
 int snare = 0;
 
-// Division sets the strand mode. 1 is regular, 2 is Mirror, 3 is Triangle (not added yet), 4 is Radial.
-int division = 2;
+// Divisor for audio signal scaling ///
+// 22 ~ 80
+// 72 ~ 10
+int Divisor = 20;
+
 
 // Don't forget to connect the ground wire to Arduino ground,
 // and the +5V wire to a +5V supply
 
 // Set the first variable to the NUMBER of pixels. 25 = 25 pixels in a row
-Adafruit_WS2801 strip = Adafruit_WS2801(72	, dataPin, clockPin);
+Adafruit_WS2801 strip = Adafruit_WS2801(pixels, dataPin, clockPin);
 
 // Optional: leave off pin numbers to use hardware SPI
 // (pinout is then specific to each board and can't be changed)
@@ -110,28 +117,97 @@ void loop() {
 
   // Update the spectrum values.
 	// readSpectrum();
+	rainbowSpectrum(10);
 
-	// rainbowCycle(10);
-	
-  // showSpectrum(10);
+	// rainbowCycle(50);
+	  // rainbowLevel(10);
 	// CrazyPixel(Color(0,0,45));
-	colorWipe(rgba(255, 255, 255,1), 5);
+	// ColorJump(100);
 	// ASCSparkle();
 
-	// BlackToBright(0,44,0,10);
+	// BlackToBright(255,44,0,10);
 
-  
+	// showSpectrum(10);
   // Some example procedures showing how to display to the pixels
   
-//  colorWipe(Color(255, 0, 0), 50);
+ // colorWipe(Color(255, 0, 0), 50);
 //  colorWipe(Color(0, 255, 0), 50);
 //  colorWipe(Color(0, 0, 255), 50);
 //  rainbow(1000);
 //  rainbowCycle(20);
 }
 
+// foreach spectrum pick a color and run an alpha intensity.
+void rainbowSpectrum(uint8_t wait)
+{
+	readSpectrum();
+
+  // static unsigned int Divisor = 20;
+  unsigned int works,i,j;
+	
+	int alpha;
+	double a;
+  int peak = Spectrum[1]/Divisor;
+	int wheel = Spectrum[1]/20;
+
+  // for (int i=0; i < strip.numPixels() / division; i++) {
+			
+
+  // for (j=0; j < 256 * 5; j++) {     // 5 cycles of all 25 colors in the wheel
+  // for (int s=0;s<7;s++) {  	
+    for (i=0; i < strip.numPixels()/division; i++) {
+
+		  alpha = Spectrum[1]/Divisor;
+			a = (double)alpha*.01;
+
+      q(i, Wheel( ((i * 256 / strip.numPixels())) % 256,a) );
+
+			Serial.print((strip.numPixels()/division)/7);
+		  Serial.print(" - ");
+			Serial.println(a);
+   		
+    }  
+    strip.show();   // write all the pixels out
+ 		delay(wait);    
+  // }
+
+// %/100 = x/7 
+
+// 9/18 = x/7			
+		  // q(i, Wheel((s*5),alpha)); 				
+
+
+}
+void rainbowPulse(uint8_t wait)
+{
+	readSpectrum();
+
+  // static unsigned int Divisor = 20;
+  unsigned int works,i,j;
+	
+	int alpha;
+	double a;
+
+  for (int s=0;s<7;s++) {			
+  	
+    for (i=0; i < strip.numPixels()/division; i++) {
+		  alpha = Spectrum[i%7]/Divisor;
+			a = (double)alpha*.01;
+      q(i, Wheel( ((s * 256 / strip.numPixels()) + i) % 256,a) );
+
+			// Serial.print(i%7);
+			// 		  Serial.print(" - ");
+			// Serial.println(a);
+   		
+    }  
+    strip.show();   // write all the pixels out
+ 		delay(wait);    
+  }
+}
+
 void showSpectrum(uint8_t wait)
 {
+	readSpectrum();
 	
   byte Band, BarSize, MaxLevel;
   static unsigned int  Divisor = 20, ChangeTimer=0;
@@ -144,8 +220,8 @@ void showSpectrum(uint8_t wait)
 
    for (int i=0; i < strip.numPixels() / division; i++) {
      if (i <= peak) {
- 				// mirror(i, Wheel(wheel+(i*4) ),1); 
-				q(i,Color(0,0,45));
+ 				mirror(i, Wheel(wheel+(i*5),1)); 
+				// q(i,Color(0,0,45));
    			// mirror(i, Wheel(random(0,wheel)),1); 
       } else {
         q(i, Color(0,0,0));
@@ -166,6 +242,31 @@ void showSpectrum(uint8_t wait)
   delay(wait);
 }
 
+
+void rainbowLevel(uint8_t wait)
+{
+	readSpectrum();
+
+  static unsigned int  Divisor = 20;
+  unsigned int works;
+
+  int peak = Spectrum[1]/Divisor;
+	int wheel = Spectrum[1]/10;
+
+   for (int i=0; i < strip.numPixels() / division; i++) {
+     if (i <= peak) {
+ 				q(i, Wheel(wheel+(i*5),1)); 
+				// q(i,Color(0,0,45));
+   			// mirror(i, Wheel(random(0,wheel)),1); 
+      } else {
+        q(i, Color(0,0,0));
+   		}
+   			Serial.println(peak);
+   }  
+
+  strip.show();
+  delay(wait);
+}
 
 
 
@@ -214,16 +315,16 @@ void readSpectrum()
 
 
 void BlackToBright(uint8_t r, uint8_t g, uint8_t b, uint8_t DELAY){
-  int i, value;
+  int i,j, value;
   for(i=0;i<strip.numPixels()/division;i++) {
       q(i, Color(0,0,0));
    } 
    strip.show();
-   for(value=0;value<101;i++) {
+   for(value=0;value<101;value++) {
      r = r * (value/100);
      g = g * (value/100);
      b = b * (value/100);
-     for(i=0;i<strip.numPixels()/division;i++) {
+     for(j=0;j<strip.numPixels()/division;j++) {
         q(i, Color(r,g,b));
      } 
      strip.show(); 
@@ -265,10 +366,10 @@ void ColorJump(uint8_t DELAY){
   int i;
   uint32_t COLOR;
   COLOR = RandomColor();
-  for(i=0;i<strip.numPixels();i++) { q(i, COLOR); }
+  for(i=0;i<strip.numPixels()/division;i++) { q(i, COLOR); }
   strip.show();
   delay(DELAY/2);
-  for(i=0;i<strip.numPixels();i++) { q(i, Color(0,0,0)); }
+  for(i=0;i<strip.numPixels()/division;i++) { q(i, Color(0,0,0)); }
   strip.show();
   delay(DELAY/2);
 }
